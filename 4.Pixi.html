@@ -31,8 +31,34 @@
 <script src="./js/pixi4.8.2.js"></script>
 <script>
 
+    var type = 'WebGL';
+    if (!PIXI.utils.isWebGLSupported()) {
+        type = 'canvas';
+    }
+    PIXI.utils.sayHello(type);
+
+    //创建舞台并定义舞台宽、高
+    var app = new PIXI.Application({
+        width: 256,   //舞台宽度
+        height: 256,   //舞台高度
+    });
+    document.body.appendChild(app.view);  //添加舞台到body
+
+    console.log(app)
+
+    //改变舞台的背景色
+    // app.renderer.backgroundColor = '0x061239';   
+
+    // // 重新设置舞台宽高
+    // app.renderer.autoResize = true;  
+    // app.renderer.resize(512, 512);
 
 
+    // 如果你想让canvas占据整个窗口，你可以将这些CSS代码放在文档中，并且刷新你浏览器窗口的大小。
+    app.renderer.view.style.position = "absolute";
+    app.renderer.view.style.display = "block";
+    app.renderer.autoResize = true;
+    app.renderer.resize(window.innerWidth, window.innerHeight);
 
 
 // Pixi中文教程:https://www.bookstack.cn/read/LearningPixi/README.md
