@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TimelineMax 时间轴管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            user-select: none;
+        }
+
+        .bgLinear {
+            background: linear-gradient(135deg, #295fff 0%, #aa333d 80%);
+        }
+
+        .box {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+        }
+
+        .box span {
+            display: inline-block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+        }
+
+        .grey {
+            background-image: linear-gradient(135deg, #C2FFD8 10%, #465EFB 100%);
+        }
+
+        .black {
+            background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 100%);
+        }
+
+        .purple {
+            background-image: linear-gradient(135deg, #3C8CE7 10%, #00EAFF 100%);
+        }
+    </style>
+</head>
+
+<body id="wrapper">
+    <div class="box grey"><span>1</span></div>
+    <div class="box black"><span>2</span></div>
+    <div class="box purple"><span>3</span></div>
+</body>
+
+</html>
+<script src="./js/alloy_touch.js"></script>
+<!-- alloy_touch监听移动端滑动距离 -->
+<script src="./js/TweenMax.min.js"></script>
+<!-- 时间轴管理 -->
+<script>
+    // TweenMax:制作过度动画
+    // TimelineMax:时间轴管理
+
+    var progress = 0;  //进度
+    var bodyHeight = document.querySelector('body').offsetHeight;  //body的高度
+    var greyH = document.querySelector('.grey').offsetHeight;  //grey盒子的高度
+    var totalHeight = bodyHeight * 3;  // 自定义 * n 
+
+    var tlm = new TimelineMax();  //时间轴
+
+    // CSSPlugin.defaultTransformPerspective = 1000;
+
+    // tlm.to('.grey', 0.5, { y: bodyHeight / 2 - greyH });
+    // tlm.to('.black', 0.4, { x: -60, y: 0, width: window.innerWidth, height: window.innerHeight });
+    // tlm.to('.black', 0.1, { alpha: 0 });
+
+    tlm.to('.purple', 0.3, { scale: 3 }).to('.purple', 0.03, { alpha: 0 });
+    tlm.to('.black', 0.3, { scale: 3 }).to('.black', 0.03, { alpha: 0 });
+    tlm.to('.grey', 0.3, { scale: 3 }).to('.grey', 0.04, { alpha: 0 });
+
+    tlm.pause();  //初始化时暂停
+
+    // 获取进度 progress  范围0-1
+    var alloyTouch = new AlloyTouch({
+        touch: "body",//反馈触摸的dom
+        vertical: true,//不必需，默认是true代表监听竖直方向touch
+        min: -totalHeight,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
+        max: 0,   //不必需,滚动属性的最大值                       //设置下滑的最大值！！！
+        initialValue: 0,  //初始化的value值
+        change: function (value) {
+            // console.log(value) //此处value 最大值为max:0   最小值为min: -totalHeight
+            progress = -value / (totalHeight);
+            progress = progress < 0 ? 0 : progress;  //最小为0
+            progress = progress > 1 ? 1 : progress;  //最大为1
+            console.log(progress);
+            tlm.seek(progress);  // 不改变状态（播放、暂停、方向）的情况下直接跳转到某个时间点。
+        },
+    })
+
+    //Tweenmax中文官网： https://www.tweenmax.com.cn/
+</script>
