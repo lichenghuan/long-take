@@ -44,12 +44,10 @@
     });
     document.body.appendChild(app.view);  //添加舞台到body
 
-    console.log(app)
-
     //改变舞台的背景色
-    // app.renderer.backgroundColor = '0x061239';   
+    app.renderer.backgroundColor = '0xfdfbe2';
 
-    // // 重新设置舞台宽高
+    // 使用画布的resize方法可以改变canvas的大小，提供任何新的width 和 height变量给他都行。但是为了确认宽高的格式正确，将autoResize设置为true。
     // app.renderer.autoResize = true;  
     // app.renderer.resize(512, 512);
 
@@ -59,6 +57,94 @@
     app.renderer.view.style.display = "block";
     app.renderer.autoResize = true;
     app.renderer.resize(window.innerWidth, window.innerHeight);
+
+
+
+    normalImg();
+    function normalImg() {
+        PIXI.loader
+            .add(['img/img1.jpg', 'img/img2.jpg', 'img/tileset.png'])
+            .on("progress", loadProgress)  //进度
+            .load(imgDone);  //add里面的图片加载完成后执行imgDone方法
+
+        function loadProgress(loader, resource) {
+            console.log(loader.progress); //图片load的进度
+            // console.log(resource); //已经被加载的文件
+        }
+
+        //加载普通的图片
+        function imgDone() {
+            var peni = new PIXI.Sprite(
+                PIXI.loader.resources['img/img1.jpg'].texture
+            );
+
+            var qiong = new PIXI.Sprite(
+                PIXI.loader.resources['img/img2.jpg'].texture
+            )
+
+            //设置精灵图位置
+            // peni.x=30;
+            // peni.y=30;
+            //或者
+            // peni.position.set(30, 30);
+
+            //设置精灵图宽高
+            peni.width = 160;
+            peni.height = 280;
+
+            //精灵图缩放 0 - 1
+            // peni.scale.x = 0.5;
+            // peni.scale.y = 0.5;
+            //或者
+            // peni.scale.set(0.5, 0.5);
+
+            //精灵图旋转
+            //精灵的左上角代表它的位置，这个点被称之为 锚点 。如果你用像0.5这种值设定rotation，这个旋转将会 围绕着锚点发生
+            // peni.rotation = 0.5;
+            //改变锚点 0 - 1    （0.5即最中间）
+            // peni.anchor.x = 0.5;
+            // peni.anchor.y = 0.5;
+            //或者这样改变锚点
+            // peni.anchor.set(0.5, 0.5)
+
+            //将精灵图添加到舞台
+            // app.stage.addChild(peni)
+            // app.stage.addChild(qiong)
+
+            //将精灵图从舞台删除
+            // app.stage.removeChild(peni)
+            //但是通常，我们都把精灵的visible属性设置成false来让精灵简单的隐藏。
+            // peni.visible = false;
+
+
+            //加载一个精灵图，取其中一部分
+            // let texture = PIXI.utils.TextureCache['img/tileset.png'];
+            // let rectangle = new PIXI.Rectangle(96, 64, 32, 32);  //Rectangle(x, y, width, height)
+            // texture.frame = rectangle;
+            // let rocket = new PIXI.Sprite(texture);
+            // app.stage.addChild(rocket);
+
+            let fStyle = new PIXI.TextStyle({
+                fontFamily: "Arial",
+                fontSize: 36,
+                fill: "white",
+                stroke: '#ff3300',
+                strokeThickness: 4,
+                dropShadow: true,
+                dropShadowColor: "#000000",
+                dropShadowBlur: 4,
+                dropShadowAngle: Math.PI / 6,
+                dropShadowDistance: 6,
+            });
+
+            let message = new PIXI.Text('Hello PIXI', fStyle);
+            message.position.set(54, 96);
+            app.stage.addChild(message);
+
+        }
+    }
+
+
 
 
 // Pixi中文教程:https://www.bookstack.cn/read/LearningPixi/README.md
