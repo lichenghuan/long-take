@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>plane</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script src="./js/alloy_touch.js"></script>
+<script src="./js/TweenMax.min.js"></script>
+<script src="./js/pixi4.8.2.js"></script>
+<script>
+
+    // 创建场景
+    var myApp = new PIXI.Application();
+    document.body.appendChild(myApp.view);  //添加舞台到body
+
+    myApp.renderer.backgroundColor = '0x97CBFF';
+    myApp.renderer.view.style.position = "absolute";
+    myApp.renderer.view.style.display = "block";
+    myApp.renderer.autoResize = true;
+    myApp.renderer.resize(window.innerWidth, window.innerHeight);
+
+
+    PIXI.loader
+        .add(getResource())
+        .on("progress", loadProgress)  //进度
+        .load(imglLoadDone);  //add里面的图片加载完成后执行imgDone方法
+
+
+
+    var options = {
+        resource: getResource(),
+        sprites: getSprites()
+    }
+
+    console.log(options)
+
+    function imglLoadDone() {
+
+
+        Object.keys(options.sprites).forEach((key) => {
+            let op = options.sprites[key];
+            let spri = new PIXI.Sprite(PIXI.loader.resources[op.nameKey].texture);
+            // 设置属性
+            setSize(spri, op.size)
+            setAnchor(spri, op.anchor)
+            setPosition(spri, op.position)
+            // 加入场景
+            myApp.stage.addChild(spri)
+            // this.sprites[key] = spri
+        })
+
+    }
+
+    function loadProgress(loader) {
+        // console.log(loader.progress + '%'); //图片load的进度
+    }
+
+
+    //获取所有要用到的图片
+    function getResource() {
+        let imgResource = [];   //图片资源
+        //灰机 plane
+        for (let i = 0; i < 25; i++) {
+            imgResource.push({
+                name: `plane${i}`,
+                url: `./img/plane/${408 + i}.png`
+            })
+        }
+        return imgResource;
+    }
+
+
+    //首张精灵图占坑
+    function getSprites() {
+        let sprites = {
+            plane: {
+                nameKey: 'plane0',
+                size: { mode: 'widthFit', width: 0.5 },
+                position: { x: 0.5, y: 0.4 },
+                anchor: 'center'
+            }
+        }
+        return sprites;
+    }
+
+
+
+
+    // ────────────────────────────────────────────────────────────────────────────────
+    // 通用属性设置  start
+    // ────────────────────────────────────────────────────────────────────────────────
+
+    // 设置尺寸
+    function setSize(obj, size) {
+        if (size.mode === 'widthFit') { // 按宽度适应
+            const scale = myApp.screen.width * size.width / obj.width
+            obj.scale.x = scale
+            obj.scale.y = scale
+        } else if (size.mode === 'heightFit') { // 按高度适应
+            const scale = myApp.screen.height * size.height / obj.height
+            obj.scale.x = scale
+            obj.scale.y = scale
+        } else { // 自定义
+            obj.width = size.width
+            obj.height = size.height
+        }
+    }
+
+    // 设置锚点
+    function setAnchor(obj, anchor) {
+        if (typeof anchor === 'string') {
+            const anchorMap = positionMap(anchor)
+            obj.anchor.x = anchorMap.x
+            obj.anchor.y = anchorMap.y
+        } else {
+            obj.anchor.x = anchor.x
+            obj.anchor.y = anchor.y
+        }
+    }
+
+    // 设置位置
+    function setPosition(obj, position) {
+        if (typeof position === 'string') {
+            position = positionMap(position)
+        }
+        obj.position.x = position.x * myApp.screen.width
+        obj.position.y = position.y * myApp.screen.height
+    }
+
+    // 位置转换
+    function positionMap(type) {
+        const map = {
+            top: { x: 0.5, y: 0 },
+            right: { x: 1, y: 0.5 },
+            bottom: { x: 0.5, y: 1 },
+            left: { x: 0, y: 0.5 },
+            topLeft: { x: 0, y: 0 },
+            topRight: { x: 1, y: 0 },
+            bottomLeft: { x: 0, y: 1 },
+            bottomRight: { x: 1, y: 1 },
+            center: { x: 0.5, y: 0.5 }
+        }
+        return map[type] || { x: 0, y: 0 }
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────────
+    // 通用属性设置  end
+    // ────────────────────────────────────────────────────────────────────────────────
+
+
+
+
+</script>
