@@ -33,6 +33,27 @@
 <script src="./js/pixi4.8.2.js"></script>
 <script>
 
+    var progress = 0;
+    var touchBody = document.body;
+    var scrollHeight = touchBody.offsetHeight;
+
+    // 获取进度 progress  范围0-1
+    var alloyTouch = new AlloyTouch({
+        touch: touchBody,//反馈触摸的dom
+        vertical: true,//不必需，默认是true代表监听竖直方向touch
+        min: -scrollHeight * 3,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
+        max: 0,   //不必需,滚动属性的最大值                       //设置下滑的最大值！！！
+        initialValue: 0,  //初始化的value值
+        change: function (value) {
+            // console.log(value) //此处value 最大值为max:0   最小值为min: -scrollHeight * 3
+            progress = -value / (scrollHeight * 3);
+            progress = progress < 0 ? 0 : progress;
+            progress = progress > 1 ? 1 : progress;
+            console.log(progress);
+        },
+    })
+
+
     // 创建场景
     var myApp = new PIXI.Application();
     document.body.appendChild(myApp.view);  //添加舞台到body
@@ -53,29 +74,59 @@
 
     var options = {
         resource: getResource(),
-        sprites: getSprites()
+        sprites: getSprites(),
+        spritesAnimations: getSpritesAnimations()
     }
 
-    console.log(options)
+    var allSprites = [];  //存放所有添加到场景中的精灵图
 
+    var TimeLine = new TimelineMax({
+        paused: true
+    })
+
+    // 动画定时器
+    var aniIntervals = []
+
+    //图片加载完成后执行
     function imglLoadDone() {
 
-        Object.keys(options.sprites).forEach((key) => {
-            let op = options.sprites[key];
-            let spri = new PIXI.Sprite(PIXI.loader.resources[op.nameKey].texture);
-            // 设置属性
-            setSize(spri, op.size)
-            setAnchor(spri, op.anchor)
-            setPosition(spri, op.position)
-            // 加入场景
-            myApp.stage.addChild(spri)
-            // this.sprites[key] = spri
-        })
+        // 初始化
+
+        initSprites()
+
+        spritesAnimate();
+
+
+        //动画 使灰机上下左循环的往返运动
+        TweenMax.fromTo(allSprites['plane'], 1, { y: window.innerHeight * 0.52 }, { yoyo: true, repeat: -1, ease: 'easeOut', y: window.innerHeight * 0.46 });
+
 
     }
 
     function loadProgress(loader) {
         // console.log(loader.progress + '%'); //图片load的进度
+    }
+
+    function initSprites() {
+        // 初始化 精灵图位置
+        Object.keys(options.sprites).forEach((key) => {
+            let op = options.sprites[key];
+            let spri = new PIXI.Sprite(PIXI.loader.resources[op.key].texture);
+            // 设置属性
+            setSize(spri, op.size)
+            setAnchor(spri, op.anchor)
+            setPosition(spri, op.position)
+            myApp.stage.addChild(spri)  // 加入场景
+            allSprites[key] = spri   //sprites 中存放已添加到场景中的精灵图,后续用到设置动画等！！！
+        })
+    }
+
+    //精灵图动画
+    function spritesAnimate() {
+        // TweenMax.fromTo(allSprites['plane'], 1, { y: window.innerHeight * 0.52 }, { yoyo: true, repeat: -1, ease: 'easeOut', y: window.innerHeight * 0.46 });
+        Object.keys(options.spritesAnimations).forEach((key) => {
+            setAnimation(allSprites[key], options.spritesAnimations[key])
+        })
     }
 
 
@@ -97,7 +148,7 @@
     function getSprites() {
         let sprites = {
             plane: {
-                nameKey: 'plane0',
+                key: 'plane0',
                 size: { mode: 'widthFit', width: 0.5 },
                 position: { x: 0.5, y: 0.4 },
                 anchor: 'center'
@@ -106,8 +157,85 @@
         return sprites;
     }
 
+    //精灵图动画
+    function getSpritesAnimations() {
+        let animations = {
+            // 飞机
+            plane: [{
+                delay: 0,
+                duration: 2,
+                frames: this.getFrames('plane', 25),
+                infinite: true,
+                frameRate: 25,
+                from: { y: window.innerHeight * 0.57 },
+                to: { yoyo: true, repeat: -1, ease: 'easeOut', y: window.innerHeight * 0.48 }
+            }, {
+                delay: 0,
+                duration: 0.1,
+                to: { alpha: 0 }
+            }]
+        }
+        return animations;
+    }
+    // 动画帧
+    function getFrames(key, n, start = 0) {
+        const frames = []
+        for (let i = start; i < n + start; i += 1) {
+            frames.push(`${key}${i}`)
+        }
+        return frames;
+    }
+
+    // 动画对象
+    function setAnimation(obj, animations) {
+        if (obj && animations && animations instanceof Array) {
+            animations.forEach(({ from, to, frames, infinite, frameRate, delay = 0, duration = 1 }) => {
+                if (frames) { // 帧动画，不断切换精灵图
+                    if (infinite) { // 无限
+                        //
+                        obj.frames = frames
+                        obj.currentFrame = 0
+                        aniIntervals.push(setInterval(() => {
+                            obj.currentFrame += 1
+                            if (obj.currentFrame >= obj.frames.length) obj.currentFrame = 0
+                            const frame = obj.frames[obj.currentFrame]
+                            obj.texture = PIXI.loader.resources[frame].texture
+                        }, duration * 1000 / frameRate))
 
 
+                    } else {
+
+                        //滑动时触发 的动画
+                        // this.on('progress', (progress) => {
+                        //     const frameProgress = (progress - delay) / duration
+                        //     let index = Math.floor(frameProgress * frames.length)
+                        //     if (index < frames.length && index >= 0) {
+                        //         const frame = frames[index]
+                        //         obj.texture = PIXI.loader.resources[frame].texture
+                        //     }
+                        // })
+
+
+                    }
+                } else if (from || to) { // 过渡动画
+                    let action
+                    if (from && to) {
+                        action = TweenMax.fromTo(obj, duration, from, to)
+                    } else if (to) {
+                        action = TweenMax.to(obj, duration, to)
+                    } else if (from) {
+                        action = TweenMax.from(obj, duration, from)
+                    }
+                    const timeline = new TimelineMax({ delay })
+                    timeline.add(action, 0)
+                    timeline.play()
+                    if (!(to && to.repeat === -1)) {
+                        TimeLine.add(timeline, 0)   //总时间轴加上
+                    }
+                }
+            })
+        }
+    }
 
     // ────────────────────────────────────────────────────────────────────────────────
     // 通用属性设置  start
