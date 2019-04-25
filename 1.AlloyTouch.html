@@ -20,7 +20,7 @@
     </style>
 </head>
 
-<body id="wrapper">
+<body>
 
 
 </body>
@@ -30,7 +30,8 @@
 <script>
 
     var progress = 0;
-    var scrollHeight = document.querySelector('#wrapper').offsetHeight;
+    var touchBody = document.body;
+    var scrollHeight = touchBody.offsetHeight;
 
     // var alloyTouch = new AlloyTouch({
     //     touch: "#wrapper",//反馈触摸的dom
@@ -58,7 +59,7 @@
 
     // 获取进度 progress  范围0-1
     var alloyTouch = new AlloyTouch({
-        touch: "#wrapper",//反馈触摸的dom
+        touch: touchBody,//反馈触摸的dom
         vertical: true,//不必需，默认是true代表监听竖直方向touch
         min: -scrollHeight * 3,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
         max: 0,   //不必需,滚动属性的最大值                       //设置下滑的最大值！！！
@@ -68,10 +69,54 @@
             progress = -value / (scrollHeight * 3);
             progress = progress < 0 ? 0 : progress;
             progress = progress > 1 ? 1 : progress;
-            console.log(progress);
+            // console.log(progress);
+
+            // trigger('progress', progress)
+            trigger(progress)
+
+
         },
     })
 
+
+
+
+
+    //简易版
+    // var func = null;  //中间函数
+
+    // function Event(callback) {
+    //     func = callback;
+    // }
+
+    // Event(function (params) {
+    //     console.log(params)
+    // })
+
+    // function trigger(params) {   //触发器
+    //     func(params);
+    // }
+
+
+        //支持多个函数版
+    // var callbackArr = [];  //1.存放函数
+
+    // function on(name, callback) {   //2.添加函数
+    //     callbackArr[name] = callbackArr[name] || [];
+    //     callbackArr[name].push(callback);
+    // }
+
+    // on('progress', function (params) {  
+    //     console.log(params)
+    // })
+
+    // function trigger(name, params) {   //3.触发器
+    //     let callbacks = callbackArr[name];
+    //     callbacks.forEach(cb => {
+    //         cb(params)   //触发对应的函数
+    //     });
+    //     console.log(callbackArr)
+    // }
 
 
 // github：https://github.com/AlloyTeam/AlloyTouch
