@@ -70,17 +70,11 @@
             progress = -value / (scrollHeight * 3);
             progress = progress < 0 ? 0 : progress;
             progress = progress > 1 ? 1 : progress;
-            // console.log(progress);
-
-            // trigger('progress', progress)
-            trigger(progress)
-
+            // trigger(progress)
+            trigger('progress', progress)
 
         },
     })
-
-
-
 
 
     //简易版
@@ -98,26 +92,27 @@
     //     func(params);
     // }
 
+    //支持多个函数版
+    var callbackObj = {};   //1.存放函数的对象
 
-        //支持多个函数版
-    // var callbackArr = [];  //1.存放函数
+    function on(name, callback) {  //2.注册 （存）
+        callbackObj[name] = callbackObj[name] || [];
+        callbackObj[name].push(callback);
+    }
 
-    // function on(name, callback) {   //2.添加函数
-    //     callbackArr[name] = callbackArr[name] || [];
-    //     callbackArr[name].push(callback);
-    // }
+    function trigger(name, params) {  //3.触发器 （取）
+        callbackObj[name].forEach(cb => {
+            cb(params)
+        });
+    }
 
-    // on('progress', function (params) {  
-    //     console.log(params)
-    // })
+    on('progress', function (params) {
+        console.log(params)
+    })
 
-    // function trigger(name, params) {   //3.触发器
-    //     let callbacks = callbackArr[name];
-    //     callbacks.forEach(cb => {
-    //         cb(params)   //触发对应的函数
-    //     });
-    //     console.log(callbackArr)
-    // }
+
+    // 这其实是事件监听相关的方法，on监听事件，trigger触发事件。比如监听动画播放进度on('progress', function(){ ... }) 
+    // 在进度变化的时候去触发progress事件，trigger('progress', this.progress)
 
 
 // github：https://github.com/AlloyTeam/AlloyTouch
