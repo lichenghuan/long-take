@@ -100,7 +100,7 @@
     }).load(() => {
         //图片加载完成后执行
 
-        //设置文本属性，添加到场景中
+        //添加一个新的文本并设置属性，添加到场景中--------------------------------------
         const text = new PIXI.Text('向上滑动，找回童年', {
             fontSize: window.innerWidth / 375 * 16,
             fill: '#242424',
@@ -115,6 +115,9 @@
         const timeline1 = new TimelineMax({ delay: 0 })
         timeline1.add(t1, 0)
         timeline1.play()
+        //这个不需要设置  TimeLine.add(timeline1, 0);
+
+
 
         // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2
         let t2 = TweenMax.to(text, 0.2, { alpha: 0 });
@@ -122,7 +125,51 @@
         timeline2.add(t2, 0)
         timeline2.play()
 
-        TimeLine.add(timeline2, 0)
+        TimeLine.add(timeline2, 0);
+
+
+
+        //添加一个新的文本并设置属性，添加到场景中--------------------------------------
+        const text2 = new PIXI.Text('《从零到一：实现通用一镜到底H5》', {
+            fontSize: window.innerWidth / 375 * 12,
+            fill: '#242424',
+            align: 'center'
+        })
+        setAnchor(text2, 'center')
+        setPosition(text2, { x: 0.5, y: 0.88 })
+        myApp.stage.addChild(text2);
+
+        // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2
+        let t3 = TweenMax.to(text2, 0.2, { alpha: 0 });
+        const timeline3 = new TimelineMax({ delay: 0 })
+        timeline3.add(t3, 0)
+        timeline3.play()
+        TimeLine.add(timeline3, 0);
+
+
+
+
+        //添加一个新的文本并设置属性，添加到场景中--------------------------------------
+        const text3 = new PIXI.Text('Powerd by: Pixi.js AlloyTouch TweenMax', {
+            fontSize: window.innerWidth / 375 * 12,
+            fill: '#242424',
+            align: 'center'
+        })
+        setAnchor(text3, 'center')
+        setPosition(text3, { x: 0.5, y: 0.92 })
+        myApp.stage.addChild(text3);
+
+        // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2
+        let t4 = TweenMax.to(text3, 0.2, { alpha: 0 });
+        const timeline4 = new TimelineMax({ delay: 0 })
+        timeline4.add(t4, 0)
+        timeline4.play()
+
+        TimeLine.add(timeline4, 0);
+
+
+
+
 
     });
 
