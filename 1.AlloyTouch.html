@@ -29,9 +29,27 @@
 <script src="./js/alloy_touch.js"></script>
 <script>
 
-    var progress = 0;
+    var progress = 0; 
     var touchBody = document.body;
     var scrollHeight = touchBody.offsetHeight;
+
+    // 获取进度 progress  范围0-1
+    var alloyTouch = new AlloyTouch({
+        touch: touchBody,//反馈触摸的dom
+        vertical: true,//不必需，默认是true代表监听竖直方向touch
+        min: -scrollHeight * 3,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
+        max: 0,   //不必需,滚动属性的最大值                       //设置下滑的最大值！！！
+        initialValue: 0,  //初始化的value值
+        change: function (value) {
+            // console.log(value) //此处value 最大值为max:0   最小值为min: -scrollHeight * 3
+            progress = -value / (scrollHeight * 3);
+            progress = progress < 0 ? 0 : progress;
+            progress = progress > 1 ? 1 : progress;
+
+            console.log(progress)
+
+        },
+    })
 
     // var alloyTouch = new AlloyTouch({
     //     touch: "#wrapper",//反馈触摸的dom
@@ -57,63 +75,6 @@
     //     animationEnd: function (value) { } //运动结束
     // })
 
+    // github：https://github.com/AlloyTeam/AlloyTouch
 
-    // 获取进度 progress  范围0-1
-    var alloyTouch = new AlloyTouch({
-        touch: touchBody,//反馈触摸的dom
-        vertical: true,//不必需，默认是true代表监听竖直方向touch
-        min: -scrollHeight * 3,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
-        max: 0,   //不必需,滚动属性的最大值                       //设置下滑的最大值！！！
-        initialValue: 0,  //初始化的value值
-        change: function (value) {
-            // console.log(value) //此处value 最大值为max:0   最小值为min: -scrollHeight * 3
-            progress = -value / (scrollHeight * 3);
-            progress = progress < 0 ? 0 : progress;
-            progress = progress > 1 ? 1 : progress;
-            // trigger(progress)
-            trigger('progress', progress)
-
-        },
-    })
-
-
-    //简易版
-    // var func = null;  //中间函数
-
-    // function Event(callback) {
-    //     func = callback;
-    // }
-
-    // Event(function (params) {
-    //     console.log(params)
-    // })
-
-    // function trigger(params) {   //触发器
-    //     func(params);
-    // }
-
-    //支持多个函数版
-    var callbackObj = {};   //1.存放函数的对象
-
-    function on(name, callback) {  //2.注册 （存）
-        callbackObj[name] = callbackObj[name] || [];
-        callbackObj[name].push(callback);
-    }
-
-    function trigger(name, params) {  //3.触发器 （取）
-        callbackObj[name].forEach(cb => {
-            cb(params)
-        });
-    }
-
-    on('progress', function (params) {
-        console.log(params)
-    })
-
-
-    // 这其实是事件监听相关的方法，on监听事件，trigger触发事件。比如监听动画播放进度on('progress', function(){ ... }) 
-    // 在进度变化的时候去触发progress事件，trigger('progress', this.progress)
-
-
-// github：https://github.com/AlloyTeam/AlloyTouch
 </script>
