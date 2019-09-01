@@ -72,7 +72,7 @@
 
 
 
-    var options = {      
+    var options = {
         resource: getResource(),
         sprites: getSprites(),
         spritesAnimations: getSpritesAnimations()
@@ -96,10 +96,8 @@
 
         spritesAnimate();
 
-
         //动画 使灰机上下左循环的往返运动
         TweenMax.fromTo(allSprites['plane'], 1, { y: window.innerHeight * 0.52 }, { yoyo: true, repeat: -1, ease: 'easeOut', y: window.innerHeight * 0.46 });
-
 
     }
 

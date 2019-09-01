@@ -20,24 +20,12 @@
 
 
 
-
-
 **需要用到以下几个库**
 
 - [AlloyTouch](https://github.com/AlloyTeam/AlloyTouch)：监听用户滑动
 - [TimelineMax](https://www.tweenmax.com.cn/api/timelinemax/)：时间轴管理
 - [TweenMax](https://www.tweenmax.com.cn/api/tweenmax/)：制作过渡动画
 - [Pixi](https://www.bookstack.cn/read/LearningPixi/README.md)：绘图，包括舞台、场景、精灵图、定时器等
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文字及文字动画</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            font-size: calc(100vw / 3.75);
+
+        }
+
+        canvas {
+            font-family: 'Avenir', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-align: center;
+            font-size: .14rem;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script src="./js/alloy_touch.js"></script>
+<script src="./js/TweenMax.min.js"></script>
+<script src="./js/pixi4.8.2.js"></script>
+<script>
+
+    var progress = 0;
+    var touchBody = document.body;
+    var scrollHeight = touchBody.offsetHeight;
+
+
+    //初始化时间轴
+    var TimeLine = new TimelineMax({
+        paused: true
+    })
+
+    var rangHeight = scrollHeight * 9;
+    // 获取进度 progress 范围0-1 -----------------------------------s
+    var alloyTouch = new AlloyTouch({
+        touch: touchBody,//反馈触摸的dom
+        vertical: true,//不必需，默认是true代表监听竖直方向touch
+        min: -rangHeight,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
+        max: 0,   //不必需,滚动属性的最大值                       //设置下滑的最大值！！！
+        initialValue: 0,  //初始化的value值
+        change: function (value) {
+            // console.log(value) //此处value 最大值为max:0   最小值为min: -(scrollHeight * 9)
+            progress = -value / rangHeight;
+            progress = progress < 0 ? 0 : progress;
+            progress = progress > 1 ? 1 : progress;
+            TimeLine.seek(progress)    //关键点  时间轴监听
+        },
+    })
+
+    // PIXI 创建场景 -----------------------------------
+    var myApp = new PIXI.Application();
+    document.body.appendChild(myApp.view);  //添加舞台到body
+    myApp.renderer.backgroundColor = '#242424';
+    myApp.renderer.view.style.position = "absolute";
+    myApp.renderer.view.style.display = "block";
+    myApp.renderer.autoResize = true;
+    myApp.renderer.resize(window.innerWidth, window.innerHeight);
+
+    PIXI.loader.load(() => {
+        //图片加载完成后执行
+
+        //添加一个新的文本并设置属性，添加到场景中---
+        const text = new PIXI.Text('向上滑动，找回童年', {
+            fontSize: '19px',
+            fill: 0xfb833f,
+            align: 'center'
+        })
+        setAnchor(text, 'center')
+        setPosition(text, { x: 0.5, y: 0.5 })
+        myApp.stage.addChild(text);
+
+        //设置文本动画
+        let t1 = TweenMax.fromTo(text, 1, { y: window.innerHeight * 0.5 }, { yoyo: true, repeat: -1, ease: 'easeOut', y: window.innerHeight * 0.48 });
+        const timeline1 = new TimelineMax({ delay: 0 })
+        timeline1.add(t1, 0)
+        timeline1.play()
+        //这个不需要设置  TimeLine.add(timeline1, 0);
+
+        // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2
+        let t2 = TweenMax.to(text, 0.2, { alpha: 0 });
+        const timeline2 = new TimelineMax({ delay: 0 })
+        timeline2.add(t2, 0)
+        timeline2.play()
+        TimeLine.add(timeline2, 0);
+
+        //添加一个新的文本并设置属性，添加到场景中---
+        const text2 = new PIXI.Text('《从零到一：实现通用一镜到底H5》', {
+            fontFamily: 'Arial',
+            fontSize: window.innerWidth / 375 * 12,
+            fill: 0xfb833f,
+            align: 'center'
+        })
+        setAnchor(text2, 'center')
+        setPosition(text2, { x: 0.5, y: 0.88 })
+        myApp.stage.addChild(text2);
+
+        // 0.7 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.7
+        let t3 = TweenMax.to(text2, 0.7, { alpha: 0 });
+        const timeline3 = new TimelineMax({ delay: 0 })
+        timeline3.add(t3, 0)
+        timeline3.play()
+        TimeLine.add(timeline3, 0);
+
+
+        //添加一个新的文本并设置属性，添加到场景中---
+        const text3 = new PIXI.Text('Powerd by: Pixi.js AlloyTouch TweenMax', {
+            fontSize: window.innerWidth / 375 * 12,
+            fill: 0xfb833f,
+            align: 'center'
+        })
+        setAnchor(text3, 'center')
+        setPosition(text3, { x: 0.5, y: 0.92 })
+        myApp.stage.addChild(text3);
+
+        // 0.7 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.7
+        let t4 = TweenMax.to(text3, 0.7, { alpha: 0 });
+        const timeline4 = new TimelineMax({ delay: 0 })
+        timeline4.add(t4, 0)
+        timeline4.play()
+        TimeLine.add(timeline4, 0);
+
+
+        //添加一个新的文本并设置属性，添加到场景中---
+        const text4 = new PIXI.Text('OVER', {
+            fontSize: window.innerWidth / 375 * 26,
+            fill: 0xfb833f,
+            align: 'center'
+        })
+        setAnchor(text4, 'center')
+        setPosition(text4, { x: 0.5, y: 0.5 })
+        myApp.stage.addChild(text4);
+
+        // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2    
+        let t5 = TweenMax.from(text4, 0.1, { alpha: 0, y: window.innerHeight * 0.57 });
+        const timeline5 = new TimelineMax({ delay: 0.6 })
+        timeline5.add(t5, 0)
+        timeline5.play()
+        TimeLine.add(timeline5, 0);
+
+
+
+    });
+
+
+    // ────────────────────────────────────────────────────────────────────────────────
+    // 通用属性设置  start
+    // ────────────────────────────────────────────────────────────────────────────────
+
+    // 设置尺寸
+    function setSize(obj, size) {
+        if (size.mode === 'widthFit') { // 按宽度适应
+            const scale = myApp.screen.width * size.width / obj.width
+            obj.scale.x = scale
+            obj.scale.y = scale
+        } else if (size.mode === 'heightFit') { // 按高度适应
+            const scale = myApp.screen.height * size.height / obj.height
+            obj.scale.x = scale
+            obj.scale.y = scale
+        } else { // 自定义
+            obj.width = size.width
+            obj.height = size.height
+        }
+    }
+
+    // 设置锚点
+    function setAnchor(obj, anchor) {
+        if (typeof anchor === 'string') {
+            const anchorMap = positionMap(anchor)
+            obj.anchor.x = anchorMap.x
+            obj.anchor.y = anchorMap.y
+        } else {
+            obj.anchor.x = anchor.x
+            obj.anchor.y = anchor.y
+        }
+    }
+
+    // 设置位置
+    function setPosition(obj, position) {
+        if (typeof position === 'string') {
+            position = positionMap(position)
+        }
+        obj.position.x = position.x * myApp.screen.width
+        obj.position.y = position.y * myApp.screen.height
+    }
+
+    // 位置转换
+    function positionMap(type) {
+        const map = {
+            top: { x: 0.5, y: 0 },
+            right: { x: 1, y: 0.5 },
+            bottom: { x: 0.5, y: 1 },
+            left: { x: 0, y: 0.5 },
+            topLeft: { x: 0, y: 0 },
+            topRight: { x: 1, y: 0 },
+            bottomLeft: { x: 0, y: 1 },
+            bottomRight: { x: 1, y: 1 },
+            center: { x: 0.5, y: 0.5 }
+        }
+        return map[type] || { x: 0, y: 0 }
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────────
+    // 通用属性设置  end
+    // ────────────────────────────────────────────────────────────────────────────────
+
+
+
+
+</script>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>new demo</title>
+    <title>精灵图及精灵图动画</title>
     <style>
         * {
             margin: 0;
@@ -19,11 +19,34 @@
             cursor: pointer;
             position: relative;
             user-select: none;
+            font-size: calc(100vw / 3.75);
+
+        }
+
+        canvas {
+            font-family: 'Avenir', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-align: center;
+            font-size: .14rem;
+        }
+
+        .loadText {
+            position: fixed;
+            width: 100%;
+            text-align: center;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            z-index: 6;
+            font-size: .22rem;
         }
     </style>
 </head>
 
 <body>
+    <div class="loadText"></div>
 
 </body>
 
@@ -59,29 +82,28 @@
         }
     }
 
-
     //初始化时间轴
     var TimeLine = new TimelineMax({
         paused: true
     })
 
+    var rangHeight = scrollHeight * 9;
     // 获取进度 progress 范围0-1 -----------------------------------
     var alloyTouch = new AlloyTouch({
         touch: touchBody,//反馈触摸的dom
         vertical: true,//不必需，默认是true代表监听竖直方向touch
-        min: -scrollHeight * 3,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
+        min: -rangHeight,  //不必需,运动属性的最小值        //设置上滑的最小值！！！
         max: 0,   //不必需,滚动属性的最大值                       //设置下滑的最大值！！！
         initialValue: 0,  //初始化的value值
         change: function (value) {
-            // console.log(value) //此处value 最大值为max:0   最小值为min: -scrollHeight * 3
-            progress = -value / (scrollHeight * 3);
+            // console.log(value) //此处value 最大值为max:0   最小值为min: -scrollHeight * 9
+            progress = -value / rangHeight;
             progress = progress < 0 ? 0 : progress;
             progress = progress > 1 ? 1 : progress;
-
             // console.log(progress)
             TimeLine.seek(progress)    //关键点  时间轴监听
+            event.trigger('progress', progress)
 
-            // event.trigger('progress', progress)
         },
     })
 
@@ -89,109 +111,87 @@
     // PIXI 创建场景 -----------------------------------
     var myApp = new PIXI.Application();
     document.body.appendChild(myApp.view);  //添加舞台到body
-    myApp.renderer.backgroundColor = '0x97CBFF';
+    myApp.renderer.backgroundColor = '242424';
     myApp.renderer.view.style.position = "absolute";
     myApp.renderer.view.style.display = "block";
     myApp.renderer.autoResize = true;
     myApp.renderer.resize(window.innerWidth, window.innerHeight);
 
-    PIXI.loader.on("progress", () => {
-        // 图片加载进度
-    }).load(() => {
-        //图片加载完成后执行
+    var resource = getResource();
 
-        //添加一个新的文本并设置属性，添加到场景中--------------------------------------
-        const text = new PIXI.Text('向上滑动，找回童年', {
-            fontSize: window.innerWidth / 375 * 16,
-            fill: '#242424',
-            align: 'center'
-        })
-        setAnchor(text, 'center')
-        setPosition(text, { x: 0.5, y: 0.5 })
-        myApp.stage.addChild(text);
+    PIXI.loader.add(resource)
+        .on("progress", (loader) => {
+            // 图片加载进度
+            var loaderPro = parseInt(loader.progress);
+            document.querySelector(".loadText").innerHTML = `图片加载中 ${loaderPro}%`;
+            if (loaderPro >= 99) {
+                document.querySelector(".loadText").innerHTML = `图片加载中 100%`;
+                document.querySelector(".loadText").style.display = 'none'
+            }
+        }).load(() => {
+            //图片加载完成后执行
 
-        //设置文本动画
-        let t1 = TweenMax.fromTo(text, 1, { y: window.innerHeight * 0.5 }, { yoyo: true, repeat: -1, ease: 'easeOut', y: window.innerHeight * 0.48 });
-        const timeline1 = new TimelineMax({ delay: 0 })
-        timeline1.add(t1, 0)
-        timeline1.play()
-        //这个不需要设置  TimeLine.add(timeline1, 0);
+            // 初始化 精灵图位置
+            let spriteObj = new PIXI.Sprite(PIXI.loader.resources['girl0'].texture);
 
 
-
-        // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2
-        let t2 = TweenMax.to(text, 0.2, { alpha: 0 });
-        const timeline2 = new TimelineMax({ delay: 0 })
-        timeline2.add(t2, 0)
-        timeline2.play()
-
-        TimeLine.add(timeline2, 0);
+            // 设置属性
+            setSize(spriteObj, { mode: "widthFit", width: 1 })
+            setAnchor(spriteObj, "center")
+            setPosition(spriteObj, "center")
+            myApp.stage.addChild(spriteObj)  // 加入场景
 
 
+            // 监听滑动时，切换不同的精灵图
+            event.on('progress', (progress) => {
+                let frames = getFrames('girl', 62);
+                // const frameProgress = (progress - delay) / duration;
+                const frameProgress = (progress - 0) / 1;
+                let index = Math.floor(frameProgress * frames.length)
+                if (index < frames.length && index >= 0) {
+                    const frame = frames[index]
+                    spriteObj.texture = PIXI.loader.resources[frame].texture; //将对应的图片呈现在
+                }
+            })
 
-        //添加一个新的文本并设置属性，添加到场景中--------------------------------------
-        const text2 = new PIXI.Text('《从零到一：实现通用一镜到底H5》', {
-            fontSize: window.innerWidth / 375 * 12,
-            fill: '#242424',
-            align: 'center'
-        })
-        setAnchor(text2, 'center')
-        setPosition(text2, { x: 0.5, y: 0.88 })
-        myApp.stage.addChild(text2);
+            // TweenMax动画   小女孩从最上面走到中间 
+            let t1 = TweenMax.fromTo(spriteObj, 0.2, { y: -window.innerHeight }, { y: window.innerHeight * 0.5 });
+            const timeline1 = new TimelineMax({ delay: 0 })
+            timeline1.add(t1, 0)
+            timeline1.play()
+            TimeLine.add(timeline1, 0);
 
-        // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2
-        let t3 = TweenMax.to(text2, 0.2, { alpha: 0 });
-        const timeline3 = new TimelineMax({ delay: 0 })
-        timeline3.add(t3, 0)
-        timeline3.play()
-        TimeLine.add(timeline3, 0);
-
-
-
-
-        //添加一个新的文本并设置属性，添加到场景中--------------------------------------
-        const text3 = new PIXI.Text('Powerd by: Pixi.js AlloyTouch TweenMax', {
-            fontSize: window.innerWidth / 375 * 12,
-            fill: '#242424',
-            align: 'center'
-        })
-        setAnchor(text3, 'center')
-        setPosition(text3, { x: 0.5, y: 0.92 })
-        myApp.stage.addChild(text3);
-
-        // 0.2 的时候消失  alpha:0   TimeLine.seek(progress)  progress > 0.2
-        let t4 = TweenMax.to(text3, 0.2, { alpha: 0 });
-        const timeline4 = new TimelineMax({ delay: 0 })
-        timeline4.add(t4, 0)
-        timeline4.play()
-
-        TimeLine.add(timeline4, 0);
+            // TweenMax动画   小女孩从中间走到最下面
+            let t2 = TweenMax.to(spriteObj, 0.3, { y: window.innerHeight * 1.2 })
+            const timeline2 = new TimelineMax({ delay: 0.7 })
+            timeline2.add(t2, 0)
+            timeline2.play()
+            TimeLine.add(timeline2, 0);
 
 
+        });
 
 
+    //获取所有要用到的图片
+    function getResource() {
+        let imgResource = [];
+        for (let i = 0; i < 62; i += 1) {
+            imgResource.push({
+                name: `girl${i}`,
+                url: `./img/girl/${160 + i}.png`
+            })
+        }
+        return imgResource;
+    }
 
-    });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // 动画帧
+    function getFrames(key, n, start = 0) {
+        const frames = []
+        for (let i = start; i < n + start; i += 1) {
+            frames.push(`${key}${i}`)   
+        }
+        return frames
+    }
 
 
 
